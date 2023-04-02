@@ -1,0 +1,34 @@
+---
+version: "3"
+
+services:
+  mongo:
+    image: mongo:latest
+    restart: always
+    networks:
+      - backend
+
+  redis:
+    image: redis:latest
+    restart: always
+    networks:
+      - backend
+
+  bidex-backend_4fcb:
+    build: ./backend
+
+    restart: always
+    ports:
+      - "8000:8000"
+    networks:
+      - backend
+
+  bidex-frontend:
+    restart: always
+    ports:
+      - "8080:80"
+    build: ./frontend
+
+networks:
+  backend:
+    driver: bridge
