@@ -31,7 +31,7 @@ func (h *UserHandler) UserRegister(c *gin.Context) {
 		return
 	}
 	user, _ := types.NewUser(uregreq.Email, uregreq.Password)
-	err = h.store.Insert(c, user)
+	err = h.store.Insert(user)
 	if err != nil {
 		c.String(http.StatusBadRequest, err.Error())
 		return
@@ -48,7 +48,7 @@ func (u *UserHandler) UserLogin(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	usr, _ := u.store.GetByMail(c, uregreq.Email)
+	usr, _ := u.store.GetByMail(uregreq.Email)
 	if usr.ValidatePassword(uregreq.Password) {
 		token := uuid.New().String()
 

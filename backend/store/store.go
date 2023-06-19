@@ -1,15 +1,13 @@
 package store
 
 import (
-	"context"
-
 	"github.com/yasngleer/bidex/types"
 )
 
 type UserStore interface {
-	Insert(context.Context, *types.User) error
-	GetById(context.Context, string) (*types.User, error)
-	GetByMail(context.Context, string) (*types.User, error)
+	Insert(user *types.User) error
+	GetById(id int) (*types.User, error)
+	GetByMail(mail string) (*types.User, error)
 }
 
 type SessionStore interface {
@@ -19,8 +17,9 @@ type SessionStore interface {
 }
 
 type ItemStore interface {
-	Insert(ctx context.Context, items *types.Items) error
-	GetById(ctx context.Context, id string) (*types.Items, error)
-	GetAll(ctx context.Context) (*[]types.Items, error)
-	InsertBid(ctx context.Context, itemid string, bid *types.Bid) error
+	Insert(items *types.Item) error
+	GetById(id int) (*types.Item, error)
+	GetAll() (*[]types.Item, error)
+	InsertBid(bid *types.Bid) error
+	GetBidById(id int) (*types.Bid, error)
 }

@@ -5,14 +5,14 @@ import (
 )
 
 type User struct {
-	ID                string `bson:"_id,omitempty" json:"id,omitempty"`
+	ID                int    `bson:"_id,omitempty" json:"id,omitempty"`
 	Email             string `bson:"email" json:"email,omitempty"`
 	EncryptedPassword string `bson:"encryptedPassword" json:"_,omitempty"`
 }
 
 type UserResponse struct {
-	Email string `json:"email,omitempty"`
-	Token string `json:"token,omitempty"`
+	ID    int    `bson:"_id,omitempty" json:"id,omitempty"`
+	Email string `bson:"email" json:"email,omitempty"`
 }
 
 func NewUser(email, password string) (*User, error) {
@@ -29,4 +29,11 @@ func NewUser(email, password string) (*User, error) {
 func (u *User) ValidatePassword(pw string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(u.EncryptedPassword), []byte(pw))
 	return err == nil
+}
+
+func (u User) ToResponse() UserResponse {
+	return UserResponse{
+		Email: u.Email,
+		ID:    u.ID,
+	}
 }

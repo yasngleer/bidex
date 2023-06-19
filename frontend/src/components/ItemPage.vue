@@ -28,7 +28,7 @@
                     <v-col>
                         <div style="display: table"
                             class="ma-5  pa-5 bg-indigo-lighten-1 rounded-pill text-h6 rounded-pill text-left">{{
-                                bid.user[0].email }}
+                                bid.user.email }}
                         </div>
 
                     </v-col>

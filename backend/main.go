@@ -1,20 +1,23 @@
 package main
 
 import (
-	"context"
+	"fmt"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/yasngleer/bidex/api"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 
 	"github.com/yasngleer/bidex/lwebsocket"
 	"github.com/yasngleer/bidex/store"
-
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
+	dbsql, err := gorm.Open(sqlite.Open("test_file.db"), &gorm.Config{})
+	if err != nil {
+		fmt.Println(err)
+	}
 	r := gin.Default()
 	config := cors.DefaultConfig()
 	config.AllowCredentials = true
@@ -24,18 +27,13 @@ func main() {
 
 	v1 := r.Group("/api")
 
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://mongo:27017"))
-	if err != nil {
-		panic(err)
-	}
-	db := client.Database("bidex")
-	redissessiontore := store.NewRedisSessionStore("redis://redis")
-	mongouserstore := store.NewMongoUserStore(db)
-	mongoitemstore := store.NewMongoItemStore(db)
+	redissessiontore := store.NewRedisSessionStore("redis://localhost:6379")
+	gormuserstore := store.NewGormUserStore(dbsql)
+	gormitemstore := store.NewGormItemStore(dbsql)
 	websocketmanager := lwebsocket.NewWebsocketManager()
 	wshandler := &api.WsHandler{Wsmanager: websocketmanager}
-	userhandler := api.NewUserHandler(mongouserstore, redissessiontore)
-	itemhandler := api.NewItemsHandler(mongoitemstore, mongouserstore, websocketmanager)
+	userhandler := api.NewUserHandler(gormuserstore, redissessiontore)
+	itemhandler := api.NewItemsHandler(gormitemstore, gormuserstore, websocketmanager)
 	v1.POST("/users", userhandler.UserRegister)
 	v1.POST("/users/login", userhandler.UserLogin)
 	v1.GET("/ws/:id", wshandler.Ws)
